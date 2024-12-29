@@ -16,7 +16,6 @@ func TestRollD6(t *testing.T) {
 	if diceValue < 1 || diceValue > 6 {
 		t.FailNow()
 	}
-
 	rollerWaitGroup.Wait()
 
 }
@@ -24,17 +23,14 @@ func TestRollD6(t *testing.T) {
 func TestRollAllDice(t *testing.T) {
 	diceTotal := 10
 	rollerWaitGroup := sync.WaitGroup{}
-	allDiceValue, err := RollAllDice(diceTotal, &rollerWaitGroup)
-	if err != nil {
-		t.Logf("error present when none was expected, %v", err.Error())
+	rollerChannel := make(chan int, 10)
+	RollAllDice(diceTotal, &rollerWaitGroup, rollerChannel)
+	rollerWaitGroup.Wait()
+	if len(rollerChannel) > 10 {
+		t.Logf("total number of dice is greater than 10, %v", len(rollerChannel))
 		t.FailNow()
-	}
-	if len(allDiceValue) > 10 {
-		t.Logf("total number of dice is greater than 10, %v", len(allDiceValue))
+	} else if len(rollerChannel) < 1 {
+		t.Logf("total number of dice is less than 10, %v", len(rollerChannel))
 		t.FailNow()
-	} else if len(allDiceValue) < 1 {
-		t.Logf("total number of dice is less than 10, %v", len(allDiceValue))
-		t.FailNow()
-
 	}
 }

@@ -16,7 +16,7 @@ func main() {
 		fmt.Printf("fewer values in in channel than expected: %v", len(diceRollerChannel))
 	}
 	diceValues := []int{}
-	for i := 0; i <= len(diceRollerChannel); i++ {
+	for i := 1; i <= diceTotal; i++ {
 		diceValues = append(diceValues, <-diceRollerChannel)
 	}
 

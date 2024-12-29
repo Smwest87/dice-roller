@@ -1,24 +1,24 @@
 package main
 
 import (
+	context2 "context"
 	"fmt"
 	"github.com/smwest87/dice-roller/internal/roller"
 	"sync"
 )
 
 func main() {
-	diceTotal := 10
-	diceRollerChannel := make(chan int, diceTotal)
+	ctx := context2.Background()
+	maximumGoRoutines := 5
+	diceTotal := 132
+	diceRollerChannel := make(chan int, maximumGoRoutines)
 	rollerWaitGroup := sync.WaitGroup{}
-	roller.RollAllDice(diceTotal, &rollerWaitGroup, diceRollerChannel)
-	rollerWaitGroup.Wait()
-	if len(diceRollerChannel) < 10 {
-		fmt.Printf("fewer values in in channel than expected: %v", len(diceRollerChannel))
-	}
+	go roller.RollAllDice(ctx, diceTotal, &rollerWaitGroup, diceRollerChannel)
 	diceValues := []int{}
-	for i := 1; i <= diceTotal; i++ {
+	for readFromChannelIterator := 1; readFromChannelIterator <= diceTotal; readFromChannelIterator++ {
 		diceValues = append(diceValues, <-diceRollerChannel)
 	}
+	rollerWaitGroup.Wait()
 
 	for _, value := range diceValues {
 		fmt.Printf("Dice Rolled: %v\n", value)
